@@ -33,7 +33,7 @@ flags.DEFINE_float('grad_clip_value', 1, 'max gradient')
 # flags.DEFINE_string()
 
 FLAGS = flags.FLAGS
-LOG_EVERY = 50
+LOG_EVERY = 100
 MAX_STEPS = 10**6
 
 
@@ -152,6 +152,11 @@ def main(_):
     data = next(train_dataset)
     state = updater.init(rng, data)
 
+    # param count
+    num_params = hk.data_structures.tree_size(state)
+    byte_size = hk.data_structures.tree_bytes(state)
+    print(f'{num_params / 1e6:.2f}M params, size: {byte_size / 1e6:.2f}MB')
+
     logging.info('Starting training loop')
     prev_time = time.time()
     for step in range(MAX_STEPS):
@@ -168,3 +173,4 @@ def main(_):
 if __name__ == '__main__':
     flags.mark_flag_as_required('dataset_path')
     app.run(main)
+
